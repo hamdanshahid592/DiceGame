@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12-Sided Dice Duel — JS Practice Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1E6;
+    --paper-raised:#F8FAF3;
+    --ink:#181D1A;
+    --ink-soft:#4B554E;
+    --rule:#C8CFC0;
+    --rule-soft:#DBE1D3;
+    --amber:#B9701F;
+    --amber-bg:#F5E4CA;
+    --teal:#20826A;
+    --teal-bg:#D6EEE5;
+    --gold:#C99A2E;
+    --radius:10px;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      linear-gradient(var(--rule-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px),
+      var(--paper);
+    background-size:28px 28px, 28px 28px, auto;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+  }
+
+  a{color:inherit;}
+
+  .wrap{
+    max-width:820px;
+    margin:0 auto;
+    padding:56px 24px 90px;
+  }
+
+  .back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-decoration:none;
+    margin-bottom:18px;
+  }
+  .back-link:hover{color:var(--ink);}
+
+  header.hero{
+    background:var(--ink);
+    color:#EDF1E7;
+    border-radius:14px;
+    padding:30px 32px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.15);
+    margin-bottom:34px;
+  }
+
+  .prompt-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:#8FBF9F;
+    margin:0 0 10px;
+  }
+
+  h1.title{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:clamp(24px,4vw,32px);
+    margin:0 0 8px;
+    letter-spacing:-0.02em;
+  }
+
+  .subtitle{
+    font-size:14px;
+    color:#B9C4B6;
+    margin:0;
+    max-width:520px;
+  }
+
+  .rules{
+    display:flex;
+    gap:26px;
+    margin-top:22px;
+    padding-top:18px;
+    border-top:1px solid rgba(255,255,255,0.12);
+    flex-wrap:wrap;
+  }
+  .rules .r b{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:18px;
+    color:#EDF1E7;
+  }
+  .rules .r span{
+    font-size:11px;
+    color:#8B9689;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+
+  .sound-toggle{
+    position:absolute;
+    top:56px;
+    right:24px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    color:var(--ink-soft);
+    padding:7px 12px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .sound-toggle:hover{border-color:var(--ink); color:var(--ink);}
+
+  .board{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    gap:22px;
+    flex-wrap:wrap;
+    margin-bottom:26px;
+  }
+
+  .team{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:14px;
+    width:260px;
+    padding:20px 20px 22px;
+    text-align:center;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .team.turn{
+    border-color:var(--accent, var(--ink));
+    box-shadow:0 0 0 3px var(--accent-bg, transparent);
+    transform:translateY(-2px);
+  }
+
+  .team.a{ --accent:var(--amber); --accent-bg:var(--amber-bg); }
+  .team.b{ --accent:var(--teal); --accent-bg:var(--teal-bg); }
+
+  .team h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    font-weight:600;
+    margin:0 0 4px;
+    letter-spacing:-0.01em;
+  }
+
+  .team .who{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--accent);
+    background:var(--accent-bg);
+    padding:2px 8px;
+    border-radius:6px;
+    margin-bottom:14px;
+  }
+
+  .metrics{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 6px;
+    margin-bottom:16px;
+  }
+  .metric{
+    background:var(--paper);
+    border:1px solid var(--rule-soft);
+    border-radius:8px;
+    padding:7px 4px;
+  }
+  .metric b{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:16px;
+  }
+  .metric span{
+    font-size:10px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+
+  .progress{
+    height:6px;
+    background:var(--rule-soft);
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+  .progress i{
+    display:block;
+    height:100%;
+    width:0%;
+    background:var(--accent);
+    border-radius:4px;
+    transition:width 0.4s ease;
+  }
+
+  .dice-stage{
+    height:120px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:18px;
+    perspective:400px;
+  }
+
+  .dice{
+    width:76px;
+    height:76px;
+    background:linear-gradient(160deg, #ffffff, #E9EDE2);
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:30px;
+    font-weight:700;
+    border-radius:14px;
+    border:1px solid var(--rule);
+    box-shadow:0 6px 14px rgba(24,29,26,0.18), inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+
+  .dice-shadow{
+    width:52px;
+    height:10px;
+    margin-top:10px;
+    background:rgba(24,29,26,0.16);
+    border-radius:50%;
+    filter:blur(1px);
+    transition:transform 0.15s ease, opacity 0.15s ease;
+  }
+
+  .dice.rolling{
+    animation:tumble 0.16s linear infinite;
+  }
+  .dice.rolling ~ .dice-shadow{
+    animation:shadow-pulse 0.16s linear infinite;
+  }
+
+  .dice.landed{
+    animation:land 0.42s cubic-bezier(.36,1.6,.46,1) both;
+  }
+  .dice.landed ~ .dice-shadow{
+    animation:shadow-land 0.42s ease both;
+  }
+
+  .dice.double{
+    background:linear-gradient(160deg, #FCE9C2, var(--amber-bg));
+    border-color:var(--gold);
+    box-shadow:0 6px 18px rgba(201,154,46,0.4), inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+
+  @keyframes tumble{
+    0%{transform:rotate(0deg) scale(1);}
+    25%{transform:rotate(95deg) scale(0.88);}
+    50%{transform:rotate(180deg) scale(1.06);}
+    75%{transform:rotate(270deg) scale(0.9);}
+    100%{transform:rotate(360deg) scale(1);}
+  }
+  @keyframes shadow-pulse{
+    0%,100%{transform:scale(1); opacity:0.5;}
+    50%{transform:scale(0.6); opacity:0.25;}
+  }
+  @keyframes land{
+    0%{transform:scale(1.35) rotate(-6deg);}
+    55%{transform:scale(0.9) rotate(3deg);}
+    100%{transform:scale(1) rotate(0deg);}
+  }
+  @keyframes shadow-land{
+    0%{transform:scale(0.5); opacity:0.2;}
+    55%{transform:scale(1.2); opacity:0.4;}
+    100%{transform:scale(1); opacity:0.5;}
+  }
+
+  button.roll-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    font-weight:600;
+    padding:10px 26px;
+    border-radius:8px;
+    border:1px solid var(--accent);
+    background:var(--accent);
+    color:#fff;
+    cursor:pointer;
+    transition:opacity 0.15s ease, transform 0.1s ease;
+  }
+  button.roll-btn:hover:not(:disabled){transform:translateY(-1px);}
+  button.roll-btn:active:not(:disabled){transform:translateY(0);}
+  button.roll-btn:disabled{
+    background:var(--paper);
+    color:var(--ink-soft);
+    border-color:var(--rule);
+    cursor:not-allowed;
+    opacity:0.7;
+  }
+
+  #banner{
+    text-align:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:16px;
+    min-height:26px;
+    color:var(--ink-soft);
+    margin-bottom:22px;
+  }
+  #banner.hot{
+    color:var(--gold);
+    font-weight:600;
+  }
+  #banner.win{
+    color:var(--gold);
+    font-weight:700;
+    font-size:20px;
+    animation:glow 1.1s ease-in-out infinite alternate;
+  }
+  @keyframes glow{
+    from{text-shadow:0 0 2px rgba(201,154,46,0.2);}
+    to{text-shadow:0 0 14px rgba(201,154,46,0.6);}
+  }
+
+  .reset-row{
+    text-align:center;
+  }
+  .reset-row button{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:transparent;
+    border:1px solid var(--rule);
+    color:var(--ink-soft);
+    padding:8px 18px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .reset-row button:hover{border-color:var(--ink); color:var(--ink);}
+
+  footer{
+    margin-top:44px;
+    padding-top:18px;
+    border-top:1px solid var(--rule);
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+  }
+
+  @media (max-width:600px){
+    .sound-toggle{position:static; display:inline-block; margin-bottom:14px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .dice.rolling, .dice.landed, .dice.rolling ~ .dice-shadow, .dice.landed ~ .dice-shadow, #banner.win{
+      animation:none;
+    }
+    .team{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back-link" href="index.html">&larr; back to JS Practice Log</a>
+
+  <header class="hero" style="position:relative;">
+    <p class="prompt-line">$ node dice-duel.js</p>
+    <h1 class="title">12-Sided Dice Duel</h1>
+    <p class="subtitle">Two players alternate turns rolling a 12-sided die. Roll a 6 and it doubles to 12 points. First team to 50 wins.</p>
+    <div class="rules">
+      <div class="r"><b>d12</b><span>Die sides</span></div>
+      <div class="r"><b>50</b><span>Target score</span></div>
+      <div class="r"><b>6 &rarr; 12</b><span>Double roll</span></div>
+    </div>
+  </header>
+
+  <button class="sound-toggle" id="soundToggle" aria-pressed="true">🔊 Sound on</button>
+
+  <div class="board">
+    <div class="team a" id="teamA">
+      <h2>Team A</h2>
+      <span class="who">Rolls first</span>
+      <div class="metrics">
+        <div class="metric"><b id="tA">0</b><span>Total</span></div>
+        <div class="metric"><b id="aA">0.00</b><span>Avg</span></div>
+        <div class="metric"><b id="hA">0</b><span>High</span></div>
+        <div class="metric"><b id="lA">0</b><span>Low</span></div>
+      </div>
+      <div class="progress"><i id="pA"></i></div>
+      <div class="dice-stage">
+        <div id="dA" class="dice">?</div>
+        <div class="dice-shadow"></div>
+      </div>
+      <button class="roll-btn" id="bA">Roll</button>
+    </div>
+
+    <div class="team b" id="teamB">
+      <h2>Team B</h2>
+      <span class="who">Waiting</span>
+      <div class="metrics">
+        <div class="metric"><b id="tB">0</b><span>Total</span></div>
+        <div class="metric"><b id="aB">0.00</b><span>Avg</span></div>
+        <div class="metric"><b id="hB">0</b><span>High</span></div>
+        <div class="metric"><b id="lB">0</b><span>Low</span></div>
+      </div>
+      <div class="progress"><i id="pB"></i></div>
+      <div class="dice-stage">
+        <div id="dB" class="dice">?</div>
+        <div class="dice-shadow"></div>
+      </div>
+      <button class="roll-btn" id="bB" disabled>Roll</button>
+    </div>
+  </div>
+
+  <div id="banner" role="status" aria-live="polite"></div>
+
+  <div class="reset-row">
+    <button onclick="location.reload()">Reset game</button>
+  </div>
+
+  <footer>
+    Built with plain HTML, CSS and JavaScript — no frameworks, no audio files (sound is synthesised with the Web Audio API).
+  </footer>
+
+</div>
+
+<script>
+  // ---------- state ----------
+  let A = { t: 0, n: 0, h: 0, l: 13 };
+  let B = { t: 0, n: 0, h: 0, l: 13 };
+  let soundOn = true;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const bA = document.getElementById('bA');
+  const bB = document.getElementById('bB');
+  const dA = document.getElementById('dA');
+  const dB = document.getElementById('dB');
+  const banner = document.getElementById('banner');
+  const teamAEl = document.getElementById('teamA');
+  const teamBEl = document.getElementById('teamB');
+  const whoA = teamAEl.querySelector('.who');
+  const whoB = teamBEl.querySelector('.who');
+
+  // ---------- sound (Web Audio API — no external files) ----------
+  let ctx;
+  function getCtx(){
+    if(!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    return ctx;
+  }
+  function tone(freq, start, dur, type, gain){
+    if(!soundOn) return;
+    const c = getCtx();
+    const osc = c.createOscillator();
+    const g = c.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    g.gain.value = 0;
+    osc.connect(g).connect(c.destination);
+    const t0 = c.currentTime + start;
+    g.gain.setValueAtTime(0, t0);
+    g.gain.linearRampToValueAtTime(gain != null ? gain : 0.15, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+  function playTick(){ tone(700 + Math.random()*300, 0, 0.05, 'square', 0.05); }
+  function playThud(){ tone(120, 0, 0.18, 'sine', 0.18); tone(90, 0.02, 0.22, 'sine', 0.12); }
+  function playDouble(){ [523,659,784,1047].forEach((f,i)=> tone(f, i*0.07, 0.15, 'triangle', 0.12)); }
+  function playWin(){ [523,659,784,1047,1319].forEach((f,i)=> tone(f, i*0.12, 0.3, 'triangle', 0.14)); }
+
+  document.getElementById('soundToggle').onclick = function(){
+    soundOn = !soundOn;
+    this.textContent = soundOn ? '🔊 Sound on' : '🔇 Sound off';
+    this.setAttribute('aria-pressed', soundOn);
+  };
+
+  // ---------- game logic ----------
+  function r(){ return Math.floor(Math.random() * 12) + 1; }
+
+  function upd(team, letter){
+    document.getElementById('t' + letter).textContent = team.t;
+    document.getElementById('a' + letter).textContent = (team.t / team.n).toFixed(2);
+    document.getElementById('h' + letter).textContent = team.h;
+    document.getElementById('l' + letter).textContent = team.l;
+    document.getElementById('p' + letter).style.width = Math.min(100, (team.t / 50) * 100) + '%';
+  }
+
+  function win(){
+    if(A.t >= 50 || B.t >= 50){
+      const winner = A.t >= 50 ? 'A' : 'B';
+      banner.textContent = '🏆 Team ' + winner + ' wins!';
+      banner.className = 'win';
+      bA.disabled = true;
+      bB.disabled = true;
+      playWin();
+      return true;
+    }
+    return false;
+  }
+
+  function setTurnHighlight(player){
+    teamAEl.classList.toggle('turn', player === 'A');
+    teamBEl.classList.toggle('turn', player === 'B');
+    whoA.textContent = player === 'A' ? 'Rolling…' : (player === 'B' ? 'Waiting' : 'Rolls first');
+    whoB.textContent = player === 'B' ? 'Rolling…' : (player === 'A' ? 'Waiting' : 'Waiting');
+  }
+
+  function play(player){
+    const team = player === 'A' ? A : B;
+    const diceEl = player === 'A' ? dA : dB;
+    const otherBtn = player === 'A' ? bB : bA;
+    const thisBtn = player === 'A' ? bA : bB;
+
+    thisBtn.disabled = true;
+    otherBtn.disabled = true;
+    banner.className = '';
+    banner.textContent = 'Rolling…';
+    setTurnHighlight(player);
+
+    diceEl.classList.remove('landed', 'double');
+    const finalRoll = r();
+    const tumbleDuration = reduceMotion ? 0 : 480;
+
+    if(tumbleDuration > 0){
+      diceEl.classList.add('rolling');
+      const tickInterval = setInterval(function(){
+        diceEl.textContent = Math.floor(Math.random() * 12) + 1;
+        playTick();
+      }, 70);
+
+      setTimeout(function(){
+        clearInterval(tickInterval);
+        diceEl.classList.remove('rolling');
+        settle(player, team, diceEl, finalRoll, otherBtn);
+      }, tumbleDuration);
+    } else {
+      settle(player, team, diceEl, finalRoll, otherBtn);
+    }
+  }
+
+  function settle(player, team, diceEl, roll, otherBtn){
+    let points = roll;
+    let message = '';
+    const isDouble = roll === 6;
+
+    if(isDouble){
+      points = 12;
+      message = ' 🔥 Double points!';
+    }
+
+    diceEl.textContent = roll;
+    diceEl.classList.add('landed');
+    if(isDouble) diceEl.classList.add('double');
+    playThud();
+    if(isDouble) playDouble();
+
+    team.t += points;
+    team.n++;
+    team.h = Math.max(team.h, roll);
+    team.l = Math.min(team.l, roll);
+    upd(team, player);
+
+    banner.textContent = 'Team ' + player + ' rolled ' + roll + message;
+    banner.className = isDouble ? 'hot' : '';
+
+    if(win()) return;
+
+    otherBtn.disabled = false;
+    setTurnHighlight(player === 'A' ? 'B' : 'A');
+  }
+
+  bA.onclick = () => play('A');
+  bB.onclick = () => play('B');
+</script>
+
+</body>
+</html>

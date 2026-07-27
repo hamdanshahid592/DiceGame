@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JS Practice Log — Assignments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1E6;
+    --paper-raised:#F8FAF3;
+    --ink:#181D1A;
+    --ink-soft:#4B554E;
+    --rule:#C8CFC0;
+    --rule-soft:#DBE1D3;
+    --amber:#B9701F;
+    --amber-bg:#F5E4CA;
+    --violet:#6E4FB0;
+    --violet-bg:#E7E0F7;
+    --blue:#2C66B0;
+    --blue-bg:#DCE8F7;
+    --teal:#20826A;
+    --teal-bg:#D6EEE5;
+    --rose:#A6416A;
+    --rose-bg:#F3DCE5;
+    --indigo:#4A4FAE;
+    --indigo-bg:#E1E1F5;
+    --green:#347A3E;
+    --green-bg:#DDECDB;
+    --radius:10px;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--rule-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--rule-soft) 1px, transparent 1px),
+      var(--paper);
+    background-size:28px 28px, 28px 28px, auto;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+  }
+
+  a{color:inherit;}
+
+  .wrap{
+    max-width:920px;
+    margin:0 auto;
+    padding:56px 24px 100px;
+  }
+
+  header.hero{
+    background:var(--ink);
+    color:#EDF1E7;
+    border-radius:14px;
+    padding:34px 32px;
+    box-shadow:0 1px 0 rgba(0,0,0,0.15);
+    margin-bottom:44px;
+  }
+
+  .prompt-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:#8FBF9F;
+    margin:0 0 6px;
+  }
+
+  .term-out{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    color:#B9C4B6;
+    min-height:96px;
+    white-space:pre-wrap;
+    margin:0 0 18px;
+  }
+
+  .term-out .caret{
+    display:inline-block;
+    width:8px;
+    height:15px;
+    background:#8FBF9F;
+    vertical-align:-2px;
+    animation:blink 1s steps(1) infinite;
+  }
+
+  @keyframes blink{50%{opacity:0;}}
+
+  h1.title{
+    font-family:'IBM Plex Mono', monospace;
+    font-weight:600;
+    font-size:clamp(26px,4vw,36px);
+    margin:0 0 8px;
+    letter-spacing:-0.02em;
+  }
+
+  .subtitle{
+    font-size:15px;
+    color:#B9C4B6;
+    margin:0;
+    max-width:520px;
+  }
+
+  .stats{
+    display:flex;
+    gap:28px;
+    margin-top:24px;
+    padding-top:20px;
+    border-top:1px solid rgba(255,255,255,0.12);
+    flex-wrap:wrap;
+  }
+
+  .stat b{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:20px;
+    color:#EDF1E7;
+  }
+
+  .stat span{
+    font-size:12px;
+    color:#8B9689;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+
+  section.group{
+    margin-bottom:36px;
+  }
+
+  .group-head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    margin:0 0 14px;
+    padding-bottom:8px;
+    border-bottom:1.5px solid var(--ink);
+  }
+
+  .group-head .g-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  .group-head h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:16px;
+    font-weight:600;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+
+  .group-head .g-desc{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-left:auto;
+  }
+
+  ul.rows{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+
+  li.row{
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:var(--radius);
+    margin-bottom:10px;
+    transition:border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  li.row:hover{
+    border-color:var(--ink);
+    transform:translateX(2px);
+  }
+
+  a.row-link{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:16px 18px;
+    text-decoration:none;
+    color:var(--ink);
+    border-radius:var(--radius);
+  }
+
+  a.row-link:focus-visible{
+    outline:2px solid var(--ink);
+    outline-offset:2px;
+  }
+
+  .idx{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    width:24px;
+    flex-shrink:0;
+  }
+
+  .row-main{
+    flex:1;
+    min-width:0;
+  }
+
+  .row-title{
+    font-weight:500;
+    font-size:15px;
+    margin:0 0 3px;
+  }
+
+  .row-desc{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:0;
+  }
+
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    padding:4px 9px;
+    border-radius:6px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+
+  .open-arrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    flex-shrink:0;
+  }
+
+  a.row-link:hover .open-arrow{color:var(--ink);}
+
+  .c-amber{background:var(--amber-bg);color:var(--amber);}
+  .c-violet{background:var(--violet-bg);color:var(--violet);}
+  .c-blue{background:var(--blue-bg);color:var(--blue);}
+  .c-teal{background:var(--teal-bg);color:var(--teal);}
+  .c-rose{background:var(--rose-bg);color:var(--rose);}
+  .c-indigo{background:var(--indigo-bg);color:var(--indigo);}
+  .c-green{background:var(--green-bg);color:var(--green);}
+
+  footer{
+    margin-top:50px;
+    padding-top:18px;
+    border-top:1px solid var(--rule);
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+  }
+
+  @media (max-width:600px){
+    a.row-link{flex-wrap:wrap;}
+    .chip{order:3; margin-left:34px;}
+    .group-head{flex-direction:column; align-items:flex-start; gap:2px;}
+    .group-head .g-desc{margin-left:0;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .term-out .caret{animation:none;}
+    li.row{transition:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="prompt-line">$ node assignments.js</p>
+    <p class="term-out" id="termOut"></p>
+    <h1 class="title">JS Practice Log</h1>
+    <p class="subtitle">A working set of vanilla JavaScript exercises — from variables and conditionals through DOM events, loops, arrays, dates and string methods.</p>
+    <div class="stats">
+      <div class="stat"><b>18</b><span>Exercises</span></div>
+      <div class="stat"><b>10</b><span>Topics</span></div>
+      <div class="stat"><b>0</b><span>Dependencies</span></div>
+    </div>
+  </header>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">01</span>
+      <h2>Foundations</h2>
+      <span class="g-desc">Variables & operators</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment1.html">
+          <span class="idx">1</span>
+          <span class="row-main">
+            <p class="row-title">Variables & arithmetic</p>
+            <p class="row-desc">Marks totals, rectangle area, salary and pocket-money math, plus a look at string vs. number coercion.</p>
+          </span>
+          <span class="chip c-amber">variables</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">02</span>
+      <h2>Logic & control flow</h2>
+      <span class="g-desc">if / else & comparisons</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment2.html">
+          <span class="idx">2</span>
+          <span class="row-main">
+            <p class="row-title">Conditionals</p>
+            <p class="row-desc">Even/odd, age bands, discount tiers, login checks, triangle type and a shopping-cart discount rule.</p>
+          </span>
+          <span class="chip c-violet">if / else</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment3.html">
+          <span class="idx">3</span>
+          <span class="row-main">
+            <p class="row-title">Comparison & logical operators</p>
+            <p class="row-desc">Eligibility checks across exam results, banking withdrawals, gaming quests and admissions criteria.</p>
+          </span>
+          <span class="chip c-violet">&& / ||</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">03</span>
+      <h2>Functions & DOM events</h2>
+      <span class="g-desc">Wiring code to the page</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment4.html">
+          <span class="idx">4</span>
+          <span class="row-main">
+            <p class="row-title">Functions & event listeners</p>
+            <p class="row-desc">A marks counter that adds or deducts points on click, updating the page live.</p>
+          </span>
+          <span class="chip c-blue">functions</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment4.2.html">
+          <span class="idx">5</span>
+          <span class="row-main">
+            <p class="row-title">Age counter</p>
+            <p class="row-desc">A birthday button that increments age, with a matching "go back a year" control.</p>
+          </span>
+          <span class="chip c-blue">DOM</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment4.3.html">
+          <span class="idx">6</span>
+          <span class="row-main">
+            <p class="row-title">Bulb switch</p>
+            <p class="row-desc">Two buttons toggle a virtual light bulb between an on and off state.</p>
+          </span>
+          <span class="chip c-blue">DOM</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">04</span>
+      <h2>Loops</h2>
+      <span class="g-desc">for loops & nesting</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Asssignment5.html">
+          <span class="idx">7</span>
+          <span class="row-main">
+            <p class="row-title">Multiplication table & even numbers</p>
+            <p class="row-desc">Generates a times-table for any input, plus a lister for even numbers up to a limit.</p>
+          </span>
+          <span class="chip c-teal">for loop</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment5.2.html">
+          <span class="idx">8</span>
+          <span class="row-main">
+            <p class="row-title">Number pattern</p>
+            <p class="row-desc">A nested loop prints a right-angled staircase of digits based on the entered number.</p>
+          </span>
+          <span class="chip c-teal">nested loop</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment5.3.html">
+          <span class="idx">9</span>
+          <span class="row-main">
+            <p class="row-title">Countdown</p>
+            <p class="row-desc">Counts down from any entered number to one.</p>
+          </span>
+          <span class="chip c-teal">for loop</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment5.4.html">
+          <span class="idx">10</span>
+          <span class="row-main">
+            <p class="row-title">Sum of numbers</p>
+            <p class="row-desc">Adds up every whole number from one to the entered value.</p>
+          </span>
+          <span class="chip c-teal">for loop</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">05</span>
+      <h2>Arrays</h2>
+      <span class="g-desc">Storing & editing lists</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="assignment6.html">
+          <span class="idx">11</span>
+          <span class="row-main">
+            <p class="row-title">Shopping list</p>
+            <p class="row-desc">An editable list backed by an array, with new items added and the total count kept live.</p>
+          </span>
+          <span class="chip c-rose">array</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment7.html">
+          <span class="idx">12</span>
+          <span class="row-main">
+            <p class="row-title">Array methods</p>
+            <p class="row-desc">A run through push, pop, shift, unshift, slice and splice across ten worked examples.</p>
+          </span>
+          <span class="chip c-rose">methods</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">06</span>
+      <h2>Dates & time</h2>
+      <span class="g-desc">The Date object</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment8.html">
+          <span class="idx">13</span>
+          <span class="row-main">
+            <p class="row-title">Live countdown</p>
+            <p class="row-desc">Ticks down to any chosen date and time, updating days, hours, minutes and seconds every second.</p>
+          </span>
+          <span class="chip c-indigo">Date()</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+      <li class="row">
+        <a class="row-link" href="Assignment9.html">
+          <span class="idx">14</span>
+          <span class="row-main">
+            <p class="row-title">Duration calculator</p>
+            <p class="row-desc">Works out the time between two chosen dates, in everything from milliseconds to years.</p>
+          </span>
+          <span class="chip c-indigo">Date()</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">07</span>
+      <h2>Strings</h2>
+      <span class="g-desc">Text formatting methods</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment10.html">
+          <span class="idx">15</span>
+          <span class="row-main">
+            <p class="row-title">Student bio formatter</p>
+            <p class="row-desc">Cleans and reformats a name, city and intro using trim, slice, case conversion and replaceAll.</p>
+          </span>
+          <span class="chip c-green">strings</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">08</span>
+      <h2>Mini-apps</h2>
+      <span class="g-desc">Arrays + rendered UI</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment11.html">
+          <span class="idx">16</span>
+          <span class="row-main">
+            <p class="row-title">Popular Games</p>
+            <p class="row-desc">A card gallery driven by an array of objects, with a form to add new games and buttons to clear inputs or remove the last entry.</p>
+          </span>
+          <span class="chip c-rose">array + DOM</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">09</span>
+      <h2>APIs & async</h2>
+      <span class="g-desc">Fetch & live data</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment12.html">
+          <span class="idx">17</span>
+          <span class="row-main">
+            <p class="row-title">Ecommerce Store</p>
+            <p class="row-desc">An ecommerce product grid fetched live from an API, with category filters and an animated add-to-cart flow.</p>
+          </span>
+          <span class="chip c-blue">fetch · async</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <span class="g-num">10</span>
+      <h2>Games</h2>
+      <span class="g-desc">State, randomness & turns</span>
+    </div>
+    <ul class="rows">
+      <li class="row">
+        <a class="row-link" href="Assignment13.html">
+          <span class="idx">18</span>
+          <span class="row-main">
+            <p class="row-title">12-Sided Dice Duel</p>
+            <p class="row-desc">A two-player dice game with live stats, a tumbling roll animation and synthesised sound effects — first to 50 wins.</p>
+          </span>
+          <span class="chip c-amber">random · animation</span>
+          <span class="open-arrow">open &rarr;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <footer>
+    Built with plain HTML, CSS and JavaScript — no frameworks.
+  </footer>
+
+</div>
+
+<script>
+  var lines = [
+    "reading directory ./assignments ...",
+    "found 17 files across 9 topics",
+    "ready."
+  ];
+  var out = document.getElementById('termOut');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function typeLines(){
+    if(reduceMotion){
+      out.textContent = lines.join("\n");
+      return;
+    }
+    var full = lines.join("\n");
+    var i = 0;
+    out.innerHTML = '<span class="caret"></span>';
+    var interval = setInterval(function(){
+      i++;
+      out.innerHTML = full.slice(0, i) + '<span class="caret"></span>';
+      if(i >= full.length){
+        clearInterval(interval);
+      }
+    }, 18);
+  }
+  typeLines();
+</script>
+
+</body>
+</html>
